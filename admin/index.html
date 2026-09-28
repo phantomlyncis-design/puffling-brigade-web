@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>แอดมิน · PUFFLING BRIGADE</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ===================== หน้าเข้าสู่ระบบ ===================== -->
+<div id="loginPage" class="login" hidden>
+  <h1>แอดมิน PUFFLING BRIGADE</h1>
+  <p class="sub">เข้าสู่ระบบด้วยบัญชีเดียวกับในเกม</p>
+
+  <label for="loginEmail">อีเมล</label>
+  <input id="loginEmail" type="email" autocomplete="username" placeholder="you@example.com">
+
+  <label for="loginPassword">รหัสผ่าน</label>
+  <input id="loginPassword" type="password" autocomplete="current-password">
+
+  <button id="loginBtn" class="btn">เข้าสู่ระบบ</button>
+  <div id="loginMsg" class="msg"></div>
+
+  <p class="note" style="margin-top:18px">
+    สิทธิ์แอดมินตรวจที่ฐานข้อมูล ไม่ได้ตรวจที่หน้านี้ —
+    บัญชีที่ไม่อยู่ในตาราง <code>admins</code> เข้ามาก็ทำอะไรไม่ได้
+  </p>
+</div>
+
+<!-- ===================== หน้าหลัก ===================== -->
+<div id="appPage" hidden>
+  <header class="top">
+    <h1>แอดมิน PUFFLING BRIGADE</h1>
+    <div class="who">
+      <span id="whoEmail"></span>
+      <button id="logoutBtn" class="btn ghost small" style="margin-left:10px">ออกจากระบบ</button>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <nav class="tabs">
+      <button data-page="dash" class="on">แดชบอร์ด</button>
+      <button data-page="news">ประกาศ</button>
+      <button data-page="mail">จดหมาย</button>
+      <button data-page="players">ผู้เล่น</button>
+      <button data-page="log">บันทึกการทำงาน</button>
+    </nav>
+
+    <!-- ---------- แดชบอร์ด ---------- -->
+    <section id="page-dash" class="page on">
+      <div class="cards" id="statCards"></div>
+
+      <div class="panel" style="margin-top:20px">
+        <h2>ผู้เล่นที่สมัครล่าสุด</h2>
+        <p class="sub">10 คนล่าสุด</p>
+        <div id="recentPlayers"><div class="empty">กำลังโหลด…</div></div>
+      </div>
+
+      <div class="panel" style="margin-top:20px">
+        <h2>ผู้เล่นไปถึงด่านไหนกันแล้ว</h2>
+        <p class="sub">
+          ตัวเลขที่มีค่าที่สุดสำหรับคนทำเกม — ถ้ามีคนกองอยู่ด่านไหนผิดปกติ แปลว่าด่านนั้นยากเกินไป
+          <br>นับเฉพาะผู้เล่นที่เปิด "เซฟข้ามเครื่อง" ไว้เท่านั้น
+        </p>
+        <div id="funnelList"><div class="empty">กำลังโหลด…</div></div>
+      </div>
+
+      <div class="panel">
+        <h2>ข้อมูลที่หน้านี้ยังไม่มี</h2>
+        <p class="sub">อ่านก่อนตัดสินใจว่าจะทำอะไรต่อ</p>
+        <p style="color:var(--ink-soft)">
+          <b>ความคืบหน้าขึ้นมาเฉพาะคนที่เปิด “เซฟข้ามเครื่อง” เอง</b> —
+          ระบบปิดไว้เป็นค่าเริ่มต้นเพราะเป็นข้อมูลส่วนบุคคลตาม PDPA
+          ดังนั้นตัวเลขในหน้านี้จะน้อยกว่าจำนวนผู้เล่นจริงเสมอ
+        </p>
+        <p style="color:var(--ink-soft)">
+          ยังไม่มี: เวลาเข้าเล่นรายวัน · ระยะเวลาที่เล่นต่อครั้ง · จุดที่ผู้เล่นกดออกกลางด่าน ·
+          ระบบแบน · แจกของชดเชยแบบกลุ่ม · ช่องทางให้ผู้ใช้ขอลบบัญชี
+          (<b>ข้อสุดท้าย Google Play บังคับก่อนปล่อยเกม</b>)
+        </p>
+      </div>
+    </section>
+
+    <!-- ---------- ประกาศ ---------- -->
+    <section id="page-news" class="page">
+      <div class="panel">
+        <h2 id="newsFormTitle">เขียนประกาศใหม่</h2>
+        <p class="sub">ประกาศจะขึ้นในเกมภายใน 2 นาที หรือทันทีเมื่อผู้เล่นเปิดเกมใหม่</p>
+
+        <input type="hidden" id="newsId">
+        <div class="row">
+          <div>
+            <label for="newsTag">ป้าย</label>
+            <input id="newsTag" type="text" maxlength="20" value="ประกาศ" placeholder="ประกาศ / อัปเดต / เคล็ดลับ">
+          </div>
+          <div>
+            <label for="newsColor">สี</label>
+            <select id="newsColor">
+              <option value="sun">เหลือง (sun)</option>
+              <option value="mint">เขียว (mint)</option>
+              <option value="sky">ฟ้า (sky)</option>
+              <option value="rose">ชมพู (rose)</option>
+              <option value="crystal">ฟ้าอ่อน (crystal)</option>
+              <option value="white">ขาว (white)</option>
+            </select>
+          </div>
+          <div>
+            <label for="newsSort">ลำดับ (เลขมากขึ้นก่อน)</label>
+            <input id="newsSort" type="number" value="0">
+          </div>
+        </div>
+
+        <label for="newsTitle">หัวข้อ</label>
+        <input id="newsTitle" type="text" maxlength="120" placeholder="เช่น อัปเดตบาลานซ์บท 3">
+
+        <label for="newsBody">เนื้อหา (ขึ้นบรรทัดใหม่ได้)</label>
+        <textarea id="newsBody" maxlength="1000"></textarea>
+
+        <div class="row">
+          <div>
+            <label for="newsEnds">วันหมดอายุ (เว้นว่าง = ไม่หมดอายุ)</label>
+            <input id="newsEnds" type="datetime-local">
+          </div>
+        </div>
+
+        <div class="check">
+          <input id="newsActive" type="checkbox" checked>
+          <label for="newsActive" style="margin:0">แสดงในเกม</label>
+        </div>
+
+        <div class="actions">
+          <button id="newsSaveBtn" class="btn">บันทึกประกาศ</button>
+          <button id="newsCancelBtn" class="btn ghost" hidden>ยกเลิกการแก้ไข</button>
+        </div>
+        <div id="newsMsg" class="msg"></div>
+      </div>
+
+      <div class="panel">
+        <h2>ประกาศทั้งหมด</h2>
+        <p class="sub">รวมอันที่ปิดไว้และอันที่หมดอายุแล้ว</p>
+        <div id="newsList"><div class="empty">กำลังโหลด…</div></div>
+      </div>
+    </section>
+
+    <!-- ---------- จดหมาย ---------- -->
+    <section id="page-mail" class="page">
+      <div class="panel">
+        <h2 id="mailFormTitle">ส่งจดหมายใหม่</h2>
+        <p class="sub">ผู้เล่นจะเห็นในกล่องจดหมายทันทีที่เปิดเกม และกดรับของได้ครั้งเดียวต่อคน</p>
+
+        <div class="row">
+          <div>
+            <label for="mailAudience">ส่งถึงใคร</label>
+            <select id="mailAudience">
+              <option value="all">ผู้เล่นทุกคน</option>
+              <option value="user">ผู้เล่นคนเดียว</option>
+            </select>
+          </div>
+          <div id="mailTargetWrap" hidden>
+            <label for="mailTarget">ชื่อในเกมของผู้รับ</label>
+            <input id="mailTarget" type="text" list="playerNames" placeholder="พิมพ์ชื่อในเกม">
+            <datalist id="playerNames"></datalist>
+          </div>
+        </div>
+
+        <label for="mailTitle">หัวข้อ</label>
+        <input id="mailTitle" type="text" maxlength="120" placeholder="เช่น ขออภัยที่เซิร์ฟเวอร์ล่ม">
+
+        <label for="mailBody">เนื้อความ (ขึ้นบรรทัดใหม่ได้)</label>
+        <textarea id="mailBody" maxlength="1000"></textarea>
+
+        <h2 style="margin-top:22px;font-size:16px">ของที่แนบไปด้วย</h2>
+        <p class="sub">เว้นเป็น 0 ถ้าไม่ต้องการแนบ — ส่งจดหมายเปล่าก็ได้</p>
+        <p class="note" style="margin:-8px 0 14px">
+          <b>สแตมิน่า</b> มีเพดานตามเลเวลผู้เล่น (ประมาณ 40–240) ส่งเกินเพดานส่วนเกินจะไม่ถูกเติมให้<br>
+          <b>ชิป EXP</b> ใช้อัปเลเวล <i>ตัวละคร</i> &nbsp;·&nbsp;
+          <b>EXP ผู้เล่น</b> ใช้อัปเลเวล <i>ผู้เล่น</i> ซึ่งเพิ่มเพดานค่าทีมและเพดานสแตมิน่า<br>
+          EXP ที่ต้องใช้จากเลเวล 1 (คำนวณจากสูตรจริงในเกม):
+          ถึง <b>เลเวล 10</b> ≈ 9,200 &nbsp;·&nbsp; <b>เลเวล 30</b> ≈ 140,000
+          &nbsp;·&nbsp; <b>เลเวล 50</b> ≈ 490,000 &nbsp;·&nbsp; <b>เลเวล 100</b> ≈ 2,600,000
+          <br>เกมขึ้นเลเวลได้มากสุด 500 เลเวลต่อจดหมายหนึ่งฉบับ (กันเกมค้าง) ส่วนที่เหลือจะถูกทิ้ง
+        </p>
+
+        <div class="row">
+          <div><label for="mailCoins">เหรียญ <span class="note">สูงสุด 99,999,999</span></label>
+               <input id="mailCoins" type="number" min="0" max="99999999" value="0"></div>
+          <div><label for="mailCrystals">คริสตัล <span class="note">สูงสุด 9,999,999</span></label>
+               <input id="mailCrystals" type="number" min="0" max="9999999" value="0"></div>
+          <div><label for="mailChips">ชิป EXP <span class="note">สูงสุด 9,999,999</span></label>
+               <input id="mailChips" type="number" min="0" max="9999999" value="0"></div>
+          <div><label for="mailStamina">สแตมิน่า <span class="note">สูงสุด 9,999</span></label>
+               <input id="mailStamina" type="number" min="0" max="9999" value="0"></div>
+          <div><label for="mailPlayerExp">EXP ผู้เล่น <span class="note">สูงสุด 999,999,999</span></label>
+               <input id="mailPlayerExp" type="number" min="0" max="999999999" value="0"></div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label for="mailUnit">แถมตัวละคร (เว้นว่าง = ไม่แถม)</label>
+            <input id="mailUnit" type="text" list="unitIds" placeholder="เช่น u_rachan">
+            <datalist id="unitIds"></datalist>
+          </div>
+          <div>
+            <label for="mailShardUnit">แถมเศษของตัวละคร</label>
+            <input id="mailShardUnit" type="text" list="unitIds" placeholder="เช่น s_mangkorn">
+          </div>
+          <div>
+            <label for="mailShardCount">จำนวนเศษ <span class="note">สูงสุด 99,999</span></label>
+            <input id="mailShardCount" type="number" min="0" max="99999" value="0">
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label for="mailExpires">วันหมดอายุ (เว้นว่าง = ไม่หมดอายุ)</label>
+            <input id="mailExpires" type="datetime-local">
+          </div>
+        </div>
+
+        <div class="actions">
+          <button id="mailSendBtn" class="btn">ส่งจดหมาย</button>
+          <button id="mailClearBtn" class="btn ghost">ล้างฟอร์ม</button>
+        </div>
+        <div id="mailMsg" class="msg"></div>
+      </div>
+
+      <div class="panel">
+        <h2>จดหมายที่ส่งไปแล้ว</h2>
+        <p class="sub">ตัวเลข "รับแล้ว" คือจำนวนคนที่กดรับของไปแล้ว</p>
+        <div id="mailList"><div class="empty">กำลังโหลด…</div></div>
+      </div>
+    </section>
+
+    <!-- ---------- ผู้เล่น ---------- -->
+    <section id="page-players" class="page">
+      <div class="panel">
+        <h2>ค้นหาผู้เล่น</h2>
+        <p class="sub">ค้นจากชื่อในเกม (พิมพ์บางส่วนได้)</p>
+        <div class="row">
+          <div><input id="playerSearch" type="text" placeholder="เช่น puffy"></div>
+          <div style="flex:0 0 auto"><button id="playerSearchBtn" class="btn">ค้นหา</button></div>
+        </div>
+        <div id="playerMsg" class="msg"></div>
+        <div id="playerList" style="margin-top:12px"><div class="empty">กำลังโหลด…</div></div>
+      </div>
+
+      <div class="panel">
+        <h2>แก้ข้อมูลผู้เล่น</h2>
+        <p class="sub">
+          กด “แก้ไข” ในตารางด้านบนเพื่อดึงค่าปัจจุบันมาก่อน แล้วแก้เฉพาะช่องที่ต้องการ
+          <br><b>ช่องที่เว้นว่างไว้จะไม่ถูกแตะ</b> — ไม่ต้องกรอกให้ครบ
+        </p>
+
+        <div id="editWho" class="empty">ยังไม่ได้เลือกผู้เล่น</div>
+
+        <div id="editForm" style="display:none;margin-top:12px">
+          <div class="row">
+            <div>
+              <label>รหัสผู้ใช้ <span class="note">แก้ไม่ได้</span></label>
+              <input id="editId" type="text" readonly>
+            </div>
+            <div>
+              <label>ชื่อในเกม <span class="note">แก้ไม่ได้ที่นี่ — ใช้กล่องเปลี่ยนชื่อด้านล่าง</span></label>
+              <input id="editName" type="text" readonly>
+            </div>
+          </div>
+
+          <div class="row">
+            <div><label for="editLevel">เลเวลผู้เล่น <span class="note">1–9,999</span></label>
+              <input id="editLevel" type="number" min="1" max="9999" placeholder="ไม่แก้"></div>
+            <div><label for="editExp">EXP <span class="note">0–999,999,999</span></label>
+              <input id="editExp" type="number" min="0" max="999999999" placeholder="ไม่แก้"></div>
+          </div>
+
+          <div class="row">
+            <div><label for="editCoins">เหรียญ <span class="note">0–999,999,999</span></label>
+              <input id="editCoins" type="number" min="0" max="999999999" placeholder="ไม่แก้"></div>
+            <div><label for="editCrystals">คริสตัล <span class="note">0–9,999,999</span></label>
+              <input id="editCrystals" type="number" min="0" max="9999999" placeholder="ไม่แก้"></div>
+          </div>
+
+          <div class="row">
+            <div><label for="editChips">ชิป EXP <span class="note">0–999,999,999</span></label>
+              <input id="editChips" type="number" min="0" max="999999999" placeholder="ไม่แก้"></div>
+            <div><label for="editStamina">สแตมิน่า <span class="note">0–9,999 เกมตัดลงตามเพดานเลเวล</span></label>
+              <input id="editStamina" type="number" min="0" max="9999" placeholder="ไม่แก้"></div>
+          </div>
+
+          <div class="row">
+            <div><label for="editReason">เหตุผล <span class="note">จะถูกบันทึกไว้ถาวร</span></label>
+              <input id="editReason" type="text" maxlength="120" placeholder="เช่น ชดเชยบั๊กด่าน 3-5"></div>
+          </div>
+
+          <div class="actions">
+            <button id="editSaveBtn" class="btn warn">บันทึกการแก้ไข</button>
+            <button id="editReloadBtn" class="btn ghost">ดึงค่าปัจจุบันใหม่</button>
+          </div>
+        </div>
+
+        <div id="editMsg" class="msg"></div>
+
+        <p class="sub" style="margin-top:14px">
+          <b>ข้อจำกัดที่ต้องรู้:</b> แก้ได้เฉพาะผู้เล่นที่เปิด “เซฟข้ามเครื่อง” เอง
+          คนที่ไม่ได้เปิด ข้อมูลอยู่ในเครื่องเขาล้วน ๆ เซิร์ฟเวอร์ไม่มีให้แก้ — กรณีนั้นใช้ <b>จดหมาย</b> แทน
+          <br>ค่าที่แก้จะเข้าเครื่องผู้เล่นเมื่อเขากด “โหลดจากคลาวด์” ในหน้าบัญชี
+          ระหว่างนั้นเกมของเขาจะอัปทับไม่ได้ ระบบกันไว้ให้แล้ว
+        </p>
+      </div>
+
+      <div class="panel">
+        <h2>เปลี่ยนชื่อผู้เล่น</h2>
+        <p class="sub">ใช้เมื่อเจอชื่อไม่เหมาะสม — การกระทำนี้จะถูกบันทึกไว้</p>
+        <div class="row">
+          <div>
+            <label for="renameId">รหัสผู้เล่น (กดปุ่มเปลี่ยนชื่อในตารางเพื่อเติมให้อัตโนมัติ)</label>
+            <input id="renameId" type="text" placeholder="uuid">
+          </div>
+          <div>
+            <label for="renameTo">ชื่อใหม่</label>
+            <input id="renameTo" type="text" maxlength="16">
+          </div>
+        </div>
+        <div class="actions"><button id="renameBtn" class="btn warn">เปลี่ยนชื่อ</button></div>
+        <div id="renameMsg" class="msg"></div>
+      </div>
+    </section>
+
+    <!-- ---------- บันทึก ---------- -->
+    <section id="page-log" class="page">
+      <div class="panel">
+        <h2>บันทึกการทำงานของแอดมิน</h2>
+        <p class="sub">แก้ไม่ได้ ลบไม่ได้ — 100 รายการล่าสุด</p>
+        <div id="logList"><div class="empty">กำลังโหลด…</div></div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
