@@ -47,6 +47,7 @@
       <button data-page="dash" class="on">แดชบอร์ด</button>
       <button data-page="news">ประกาศ</button>
       <button data-page="mail">จดหมาย</button>
+      <button data-page="raid">บอสบุก</button>
       <button data-page="players">ผู้เล่น</button>
       <button data-page="log">บันทึกการทำงาน</button>
     </nav>
@@ -327,6 +328,83 @@
         </div>
         <div class="actions"><button id="renameBtn" class="btn warn">เปลี่ยนชื่อ</button></div>
         <div id="renameMsg" class="msg"></div>
+      </div>
+    </section>
+
+    <!-- ---------- บอสบุก (014_boss_raid.sql) ---------- -->
+    <section id="page-raid" class="page">
+      <div class="panel">
+        <h2>ปล่อยบอสบุก</h2>
+        <p class="sub">
+          ถึงเวลาเริ่ม เกมทุกเครื่องจะเห็นบอสบุก (ภายใน 30 วินาที) ฉากล็อบบี้เปลี่ยนตามธีม และเปิดให้ท้าบอส
+          <br>ทุกคนช่วยกันตีเลือดก้อนเดียว · เลือดหมด = ล้มบอส คนที่ช่วยตีได้รางวัลทางจดหมาย · หมดเวลาก่อน = บอสหนีไป
+          <br>ดาเมจต่อครั้งของผู้เล่น: ทีมใหม่ ~5 พัน · ทีมกลาง ~1 ล้าน · ทีมแรงสุด ~5 ล้าน (ท้าได้คนละ 3 ครั้ง/วัน)
+        </p>
+
+        <div class="row">
+          <div>
+            <label for="raidBoss">บอส</label>
+            <select id="raidBoss">
+              <option value="1">บท 1 · ราชาเงาแดง (ไฟ)</option>
+              <option value="2">บท 2 · ยักษ์รากเงา (ไม้)</option>
+              <option value="3">บท 3 · วาฬเงาน้ำแข็ง (น้ำ)</option>
+              <option value="4">บท 4 · อสูรเปลวคู่ (ไฟ)</option>
+              <option value="5">บท 5 · เจ้าป่าหมอกดำ (ไม้)</option>
+              <option value="6">บท 6 · ประตูราตรี (น้ำ)</option>
+            </select>
+          </div>
+          <div>
+            <label for="raidTheme">ฉากล็อบบี้ตอนบอสบุก</label>
+            <select id="raidTheme">
+              <option value="raid">บอสบุก (ไฟไหม้ ฟ้าแดง มังกร)</option>
+              <option value="night">กลางคืน</option>
+              <option value="day">กลางวัน</option>
+              <option value="player">ตามที่ผู้เล่นตั้งไว้</option>
+            </select>
+          </div>
+        </div>
+
+        <label for="raidTitle">ข้อความ (ไม่บังคับ)</label>
+        <input id="raidTitle" type="text" maxlength="60" placeholder="เช่น อสูรเปลวคู่บุกปราสาท!">
+
+        <div class="row">
+          <div>
+            <label for="raidStart">เริ่ม (เวลาไทย)</label>
+            <input id="raidStart" type="datetime-local">
+          </div>
+          <div>
+            <label for="raidHours">อยู่นาน (ชั่วโมง)</label>
+            <input id="raidHours" type="number" min="0.25" max="168" step="0.25" value="3">
+          </div>
+          <div>
+            <label for="raidHp">เลือดรวม</label>
+            <input id="raidHp" type="number" min="1" step="1" value="50000000">
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label for="raidCrystals">รางวัลล้มบอส: คริสตัล (ต่อคน)</label>
+            <input id="raidCrystals" type="number" min="0" max="100000" value="100">
+          </div>
+          <div>
+            <label for="raidCoins">รางวัลล้มบอส: เหรียญ (ต่อคน)</label>
+            <input id="raidCoins" type="number" min="0" max="10000000" value="20000">
+          </div>
+        </div>
+
+        <div class="actions">
+          <button id="raidNowBtn" class="btn ghost">ตั้งเวลาเริ่ม = ตอนนี้</button>
+          <button id="raidSaveBtn" class="btn">ปล่อยบอส</button>
+        </div>
+        <div id="raidMsg" class="msg"></div>
+      </div>
+
+      <div class="panel">
+        <h2>บอสบุกทั้งหมด</h2>
+        <p class="sub">50 ตัวล่าสุด · "ยุติ" = บอสหายไปทันที ไม่มีรางวัล · ลบได้เฉพาะตัวที่ยังไม่มีใครตี</p>
+        <div class="actions" style="margin-top:0"><button id="raidReloadBtn" class="btn ghost small">โหลดใหม่</button></div>
+        <div id="raidList"><div class="empty">กำลังโหลด…</div></div>
       </div>
     </section>
 

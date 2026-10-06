@@ -204,6 +204,7 @@
     loadNews();
     loadPlayers("");
     loadMail();
+    loadRaids();
     loadLog();
     fillUnitList();
   }
@@ -438,6 +439,136 @@
       loadLog();
     } catch (e) {
       say($("newsMsg"), friendly(e.message), "err");
+    }
+  }
+
+  // ------------------------------------------------------------------
+  // บอสบุก (supabase/014_boss_raid.sql) — แอดมินปล่อยบอส ทุกคนช่วยกันตีจนตาย
+  // ------------------------------------------------------------------
+
+  var RAID_BOSS = ["", "ราชาเงาแดง", "ยักษ์รากเงา", "วาฬเงาน้ำแข็ง", "อสูรเปลวคู่", "เจ้าป่าหมอกดำ", "ประตูราตรี"];
+  var RAID_THEME = { raid: "บอสบุก", night: "กลางคืน", day: "กลางวัน", player: "ตามผู้เล่น" };
+
+  // datetime-local ใช้เวลาเครื่องของแอดมิน (เครื่องตั้งเวลาไทยอยู่แล้ว)
+  function localInput(d) {
+    var p = function (n) { return (n < 10 ? "0" : "") + n; };
+    return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate()) + "T" + p(d.getHours()) + ":" + p(d.getMinutes());
+  }
+
+  function raidState(r) {
+    var now = new Date();
+    if (r.cancelled) return { t: "ยุติแล้ว", on: false };
+    if (r.defeated_at) return { t: "ล้มแล้ว", on: false };
+    if (new Date(r.starts_at) > now) return { t: "รอเริ่ม", on: true };
+    if (new Date(r.ends_at) <= now) return { t: "หนีไป (หมดเวลา)", on: false };
+    return { t: "กำลังบุก", on: true };
+  }
+
+  async function loadRaids() {
+    try {
+      var r = await rest("rpc/admin_raid_list", { method: "POST", body: {} });
+      var rows = r.data || [];
+      if (!rows.length) { $("raidList").innerHTML = '<div class="empty">ยังไม่เคยปล่อยบอส</div>'; return; }
+      $("raidList").innerHTML =
+        "<table><thead><tr><th>สถานะ</th><th>บอส</th><th>เริ่ม → จบ</th><th>เลือด</th>" +
+        '<th class="num">คนช่วยตี</th><th>5 อันดับดาเมจ</th><th class="num">จัดการ</th></tr></thead><tbody>' +
+        rows.map(function (b) {
+          var st = raidState(b);
+          var pct = b.hp_max > 0 ? Math.ceil(100 * b.hp / b.hp_max) : 0;
+          var top = (b.top || []).map(function (x) { return esc(x.name) + " " + n0(x.damage); }).join("<br>");
+          var live = !b.cancelled && !b.defeated_at && new Date(b.ends_at) > new Date();
+          return "<tr>" +
+            '<td><span class="tag ' + (st.on ? "on" : "off") + '">' + esc(st.t) + "</span>" +
+              (b.defeated_at && b.killer_name ? "<br><small>ตีปิด: " + esc(b.killer_name) + "</small>" : "") + "</td>" +
+            "<td>" + esc(RAID_BOSS[b.boss] || ("บท " + b.boss)) + (b.title ? "<br><small>" + esc(b.title) + "</small>" : "") +
+              "<br><small>ฉาก: " + esc(RAID_THEME[b.theme] || b.theme) + "</small></td>" +
+            "<td>" + esc(thaiDate(b.starts_at)) + "<br>→ " + esc(thaiDate(b.ends_at)) + "</td>" +
+            "<td>" + n0(b.hp) + " / " + n0(b.hp_max) + " (" + pct + "%)" +
+              '<div style="height:6px;background:rgba(255,255,255,.1);border-radius:3px;margin-top:4px">' +
+              '<div style="height:6px;width:' + pct + '%;background:#e5484d;border-radius:3px"></div></div>' +
+              "<small>รางวัล: คริสตัล " + n0(b.reward_crystals) + " · เหรียญ " + n0(b.reward_coins) + "</small></td>" +
+            '<td class="num">' + n0(b.players) + "</td>" +
+            "<td><small>" + (top || "-") + "</small></td>" +
+            '<td class="num">' +
+              (live ? '<button class="btn warn small" data-raidstop="' + b.id + '">ยุติ</button> ' : "") +
+              (b.players == 0 ? '<button class="btn ghost small" data-raiddel="' + b.id + '">ลบ</button>' : "") +
+            "</td></tr>";
+        }).join("") + "</tbody></table>";
+      wire("[data-raidstop]", "data-raidstop", function (id) { stopRaid(rows, id); });
+      wire("[data-raiddel]", "data-raiddel", function (id) { deleteRaid(rows, id); });
+    } catch (e) {
+      var m = e.message || "";
+      if (m.indexOf("admin_raid_list") >= 0 || m.indexOf("PGRST202") >= 0)
+        m = "ยังไม่ได้รัน supabase/014_boss_raid.sql ใน SQL Editor";
+      $("raidList").innerHTML = '<div class="empty">' + esc(m) + "</div>";
+    }
+  }
+
+  async function saveRaid() {
+    var startVal = $("raidStart").value;
+    if (!startVal) { say($("raidMsg"), "ใส่เวลาเริ่มด้วย", "err"); return; }
+    var start = new Date(startVal);
+    var hours = parseFloat($("raidHours").value);
+    var hp = parseInt($("raidHp").value, 10);
+    if (!(hours > 0) || hours > 168) { say($("raidMsg"), "อยู่นานได้ 0.25–168 ชั่วโมง", "err"); return; }
+    if (!(hp > 0)) { say($("raidMsg"), "ใส่เลือดรวมมากกว่า 0", "err"); return; }
+    if (start < new Date(Date.now() - 5 * 60000)) { say($("raidMsg"), "เวลาเริ่มผ่านไปแล้ว — กด \"ตั้งเวลาเริ่ม = ตอนนี้\" ถ้าจะปล่อยทันที", "err"); return; }
+    var end = new Date(start.getTime() + hours * 3600000);
+    var boss = parseInt($("raidBoss").value, 10);
+    var payload = {
+      boss: boss,
+      title: $("raidTitle").value.trim(),
+      theme: $("raidTheme").value,
+      starts_at: start.toISOString(),
+      ends_at: end.toISOString(),
+      hp_max: hp,
+      hp: hp,
+      reward_crystals: Math.max(0, parseInt($("raidCrystals").value, 10) || 0),
+      reward_coins: Math.max(0, parseInt($("raidCoins").value, 10) || 0),
+      created_by: session ? session.user_id : null
+    };
+    var summary = RAID_BOSS[boss] + " · " + thaiDate(payload.starts_at) + " · " + hours + " ชม. · เลือด " + n0(hp);
+    if (!confirm("ปล่อยบอสบุก?\n\n" + summary + "\nรางวัลต่อคน: คริสตัล " + n0(payload.reward_crystals) + " · เหรียญ " + n0(payload.reward_coins))) return;
+    $("raidSaveBtn").disabled = true;
+    say($("raidMsg"), "กำลังบันทึก…", "wait");
+    try {
+      await rest("boss_raids", { method: "POST", headers: { "Prefer": "return=minimal" }, body: payload });
+      await logAction("ปล่อยบอสบุก", "boss_raid", summary);
+      say($("raidMsg"), "ปล่อยบอสแล้ว — " + summary, "ok");
+      loadRaids();
+      loadLog();
+    } catch (e) {
+      say($("raidMsg"), friendly(e.message), "err");
+    } finally {
+      $("raidSaveBtn").disabled = false;
+    }
+  }
+
+  async function stopRaid(rows, id) {
+    var b = findById(rows, id);
+    if (!b) return;
+    if (!confirm("ยุติบอส " + (RAID_BOSS[b.boss] || "") + " ตอนนี้?\n\nบอสหายไปจากเกมทันที ไม่มีรางวัลล้มบอส (ดาเมจที่ตีไปแล้วยังนับอันดับ)")) return;
+    try {
+      await rest("boss_raids?id=eq." + encodeURIComponent(id), { method: "PATCH", body: { cancelled: true } });
+      await logAction("ยุติบอสบุก", "boss_raid:" + id, RAID_BOSS[b.boss] || "");
+      loadRaids();
+      loadLog();
+    } catch (e) {
+      say($("raidMsg"), friendly(e.message), "err");
+    }
+  }
+
+  async function deleteRaid(rows, id) {
+    var b = findById(rows, id);
+    if (!b) return;
+    if (!confirm("ลบบอสบุกนี้ออกจากรายการ?")) return;
+    try {
+      await rest("boss_raids?id=eq." + encodeURIComponent(id), { method: "DELETE" });
+      await logAction("ลบบอสบุก", "boss_raid:" + id, RAID_BOSS[b.boss] || "");
+      loadRaids();
+      loadLog();
+    } catch (e) {
+      say($("raidMsg"), friendly(e.message), "err");
     }
   }
 
@@ -863,6 +994,8 @@
         return "ส่งถึงคนเดียวต้องเลือกผู้รับ / ส่งถึงทุกคนต้องไม่เลือกผู้รับ";
       return "มีค่าที่ใส่เกินขีดที่กำหนด ลองลดตัวเลขลง";
     }
+    if (m.indexOf("boss_raids_time") >= 0)
+      return "เวลาจบต้องหลังเวลาเริ่ม";
     if (m.indexOf("foreign key") >= 0)
       return "ไม่พบผู้รับคนนี้ในระบบ";
 
@@ -891,6 +1024,10 @@
     $("newsSaveBtn").addEventListener("click", saveNews);
     $("newsCancelBtn").addEventListener("click", clearNewsForm);
 
+    $("raidSaveBtn").addEventListener("click", saveRaid);
+    $("raidReloadBtn").addEventListener("click", loadRaids);
+    $("raidNowBtn").addEventListener("click", function () { $("raidStart").value = localInput(new Date(Date.now() + 60000)); });
+    $("raidStart").value = localInput(new Date(Date.now() + 3600000));
     $("playerSearchBtn").addEventListener("click", function () { loadPlayers($("playerSearch").value.trim()); });
     $("playerSearch").addEventListener("keydown", function (e) {
       if (e.key === "Enter") loadPlayers($("playerSearch").value.trim());
