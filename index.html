@@ -98,7 +98,19 @@
       // JS_FileSystem_Sync() behavior, but in future Unity version, this will be
       // expected to change.
 
-      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+      // เครื่องที่อ่านรูปแบบ ASTC ได้ (iPad/iPhone/Android ส่วนใหญ่) ใช้ไฟล์ข้อมูลชุด ASTC (BuildTools.cs บิลด์ให้)
+      // ชุดปกติเป็น DXT ซึ่ง Safari อ่านไม่ได้ เกมต้องแตกรูปเป็น RGBA ใหญ่ 4 เท่า → iPad แรมเต็ม ค้าง/เด้งออก
+      try {
+        var astcProbe = document.createElement("canvas");
+        var astcGl = astcProbe.getContext("webgl2") || astcProbe.getContext("webgl");
+        if (astcGl && astcGl.getExtension("WEBGL_compressed_texture_astc")) {
+          config.dataUrl = buildUrl + "/WebGL.astc.data.unityweb";
+        }
+        var astcLose = astcGl && astcGl.getExtension("WEBGL_lose_context");
+        if (astcLose) astcLose.loseContext();
+      } catch (e) {}
+
+      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)) {
         // Mobile device style: fill the whole browser client area with the game canvas:
 
         var meta = document.createElement('meta');
