@@ -159,6 +159,7 @@
   }
 
   function signOut() {
+    if (window.PufflingDashboard) window.PufflingDashboard.reset();
     if (session) auth("logout", { method: "POST", body: {} }).catch(function () {});
     session = null;
     saveSession();
@@ -229,26 +230,27 @@
   // ------------------------------------------------------------------
 
   async function loadDashboard() {
+    $("dashboardRefresh").disabled = true;
+    $("dashboardUpdated").textContent = "กำลังโหลดข้อมูล…";
     try {
       var r = await rest("rpc/admin_dashboard", { method: "POST", body: {} });
-      var d = r.data || {};
+      if (!r.data) throw new Error("ไม่มีสิทธิ์อ่านข้อมูลแดชบอร์ด");
+      var d = r.data;
       var cards = [
-        { k: "ผู้เล่นทั้งหมด",        n: d.players_total },
-        { k: "สมัครวันนี้",           n: d.players_today },
-        { k: "สมัครใน 7 วัน",         n: d.players_week },
-        { k: "เปิดเซฟข้ามเครื่อง",    n: d.saves_total },
-        { k: "เล่นใน 7 วัน",          n: d.saves_active_week },
-        { k: "เลเวลเฉลี่ย",           n: d.avg_level },
-        { k: "ด่านที่ผ่านเฉลี่ย",     n: d.avg_stages },
-        { k: "ประกาศที่แสดงอยู่",     n: d.announcements_active },
-        { k: "แอดมิน",                n: d.admins_total }
+        { k: "ผู้เล่นทั้งหมด", n: d.players_total, icon: "♙", note: "บัญชีที่ลงทะเบียนบนเซิร์ฟเวอร์" },
+        { k: "เซฟอัปเดตใน 7 วัน", n: d.saves_active_week, icon: "◷", note: "นับจากเวลาอัปเดตความคืบหน้า" },
+        { k: "ผู้เล่นใหม่ใน 7 วัน", n: d.players_week, icon: "↗", note: "สมัครในช่วง 7 วันย้อนหลัง" },
+        { k: "เลเวลผู้เล่นเฉลี่ย", n: d.avg_level, icon: "✦", note: "เฉพาะบัญชีที่มีเซฟบนคลาวด์" }
       ];
       $("statCards").innerHTML = cards.map(function (c) {
-        return '<div class="card"><div class="n">' + esc(c.n === undefined ? "—" : c.n) +
-               '</div><div class="k">' + esc(c.k) + "</div></div>";
+        return '<div class="card"><span class="stat-icon" aria-hidden="true">' + c.icon + '</span><div class="k">' + esc(c.k) +
+               '</div><div class="n">' + esc(c.n == null ? "—" : Number(c.n).toLocaleString("th-TH")) +
+               '</div><div class="stat-note">' + esc(c.note) + '</div></div>';
       }).join("");
+      if (window.PufflingDashboard) window.PufflingDashboard.overview(d);
     } catch (e) {
       $("statCards").innerHTML = '<div class="card"><div class="k">โหลดตัวเลขไม่ได้: ' + esc(e.message) + "</div></div>";
+      if (window.PufflingDashboard) window.PufflingDashboard.overviewError();
     }
 
     try {
@@ -258,7 +260,8 @@
       $("recentPlayers").innerHTML = '<div class="empty">' + esc(e.message) + "</div>";
     }
 
-    loadFunnel();
+    await loadFunnel();
+    $("dashboardRefresh").disabled = false;
   }
 
   async function loadFunnel() {
@@ -267,7 +270,7 @@
       var rows = r.data || [];
       if (!rows.length) {
         $("funnelList").innerHTML =
-          '<div class="empty">ยังไม่มีใครเปิดเซฟข้ามเครื่อง — ตัวเลขจะขึ้นเมื่อมีผู้เล่นเปิดใช้</div>';
+          '<div class="empty">ยังไม่มีข้อมูลความคืบหน้าบนเซิร์ฟเวอร์</div>';
         return;
       }
 
@@ -1016,6 +1019,7 @@
 
   async function boot() {
     setupTabs();
+    $("dashboardRefresh").addEventListener("click", loadDashboard);
 
     $("loginBtn").addEventListener("click", doLogin);
     $("loginPassword").addEventListener("keydown", function (e) { if (e.key === "Enter") doLogin(); });

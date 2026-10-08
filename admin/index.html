@@ -5,16 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow">
   <title>แอดมิน · PUFFLING BRIGADE</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="dashboard.css">
 </head>
 <body>
 
 <!-- ===================== หน้าเข้าสู่ระบบ ===================== -->
 <div id="loginPage" class="login" hidden>
-  <h1>แอดมิน PUFFLING BRIGADE</h1>
+  <a class="admin-brand" href="/"><span class="admin-brand-mark">✦</span><span>PUFFLING<small>BRIGADE / CONTROL ROOM</small></span></a>
+  <p class="admin-eyebrow">WELCOME BACK, CREATOR</p>
+  <h1>ดูแลโลกของปุยนุ่น</h1>
   <p class="sub">เข้าสู่ระบบด้วยบัญชีเดียวกับในเกม</p>
 
   <label for="loginEmail">อีเมล</label>
@@ -24,18 +24,17 @@
   <input id="loginPassword" type="password" autocomplete="current-password">
 
   <button id="loginBtn" class="btn">เข้าสู่ระบบ</button>
-  <div id="loginMsg" class="msg"></div>
+  <div id="loginMsg" class="msg" role="status" aria-live="polite"></div>
 
   <p class="note" style="margin-top:18px">
-    สิทธิ์แอดมินตรวจที่ฐานข้อมูล ไม่ได้ตรวจที่หน้านี้ —
-    บัญชีที่ไม่อยู่ในตาราง <code>admins</code> เข้ามาก็ทำอะไรไม่ได้
+    สำหรับบัญชีผู้ดูแลที่ได้รับสิทธิ์เท่านั้น<br><a href="/">← กลับเว็บไซต์ Puffling Brigade</a>
   </p>
 </div>
 
 <!-- ===================== หน้าหลัก ===================== -->
 <div id="appPage" hidden>
   <header class="top">
-    <h1>แอดมิน PUFFLING BRIGADE</h1>
+    <div class="admin-page-title"><p>CONTROL ROOM <span>/</span> <span id="currentPageLabel">OVERVIEW</span></p><h1 id="currentPageTitle">ภาพรวมกองทัพปุยนุ่น</h1></div>
     <div class="who">
       <span id="whoEmail"></span>
       <button id="logoutBtn" class="btn ghost small" style="margin-left:10px">ออกจากระบบ</button>
@@ -43,48 +42,53 @@
   </header>
 
   <div class="wrap">
-    <nav class="tabs">
-      <button data-page="dash" class="on">แดชบอร์ด</button>
-      <button data-page="news">ประกาศ</button>
-      <button data-page="mail">จดหมาย</button>
-      <button data-page="raid">บอสบุก</button>
-      <button data-page="players">ผู้เล่น</button>
-      <button data-page="log">บันทึกการทำงาน</button>
+    <nav class="tabs" aria-label="เครื่องมือผู้ดูแล">
+      <a class="admin-brand" href="/"><span class="admin-brand-mark">✦</span><span>PUFFLING<small>BRIGADE</small></span></a>
+      <p class="sidebar-label">WORKSPACE</p>
+      <button data-page="dash" class="on" aria-current="page"><span class="nav-icon">▦</span>แดชบอร์ด<span class="nav-active-dot"></span></button>
+      <button data-page="news"><span class="nav-icon">◈</span>ประกาศ</button>
+      <button data-page="mail"><span class="nav-icon">✉</span>จดหมาย</button>
+      <button data-page="raid"><span class="nav-icon">⚔</span>บอสบุก</button>
+      <button data-page="players"><span class="nav-icon">♙</span>ผู้เล่น</button>
+      <button data-page="log"><span class="nav-icon">≡</span>บันทึกการทำงาน</button>
+      <div class="sidebar-bottom"><span class="sidebar-paw">✦</span><strong>A little world.<br>A big adventure.</strong><p>พื้นที่สำหรับผู้สร้างโลกปุยนุ่น</p><a href="/" target="_blank" rel="noopener">เปิดเว็บไซต์ ↗</a></div>
     </nav>
 
     <!-- ---------- แดชบอร์ด ---------- -->
     <section id="page-dash" class="page on">
+      <div class="dashboard-welcome"><div><p class="admin-eyebrow">YOUR WORLD, AT A GLANCE</p><h2>ยินดีต้อนรับกลับมา <span>✦</span></h2><p>ดูแลผู้เล่น ติดตามความคืบหน้า และเตรียมก้าวต่อไปของเกม</p></div><div class="dashboard-refresh"><span id="dashboardUpdated" role="status">กำลังโหลดข้อมูล…</span><button id="dashboardRefresh" class="btn ghost small">↻ อัปเดตข้อมูล</button></div></div>
       <div class="cards" id="statCards"></div>
-
-      <div class="panel" style="margin-top:20px">
+      <div id="secondaryStats" class="secondary-stats"></div>
+      <div class="dashboard-columns">
+      <section class="panel revenue-panel" aria-labelledby="revenueTitle">
+        <div class="panel-heading"><div><p class="admin-eyebrow">MERCHANDISE / REVENUE</p><h2 id="revenueTitle">ภาพรวมรายได้สินค้า</h2></div><span id="revenueSource" class="source-chip">ยังไม่มีแหล่งข้อมูล</span></div>
+        <p class="sub">สำหรับเสื้อและของสะสมในอนาคต · แยกจากคริสตัลและเหรียญในเกม</p>
+        <div class="revenue-toolbar"><div class="chart-toggle" aria-label="รูปแบบกราฟ"><button data-chart="bar" class="active" aria-pressed="true">▥ แท่ง</button><button data-chart="line" aria-pressed="false">⌁ เส้น</button></div><label class="range-label" for="revenueRange">ช่วงเวลา<select id="revenueRange"><option value="7">7 วัน</option><option value="30" selected>30 วัน</option><option value="90">90 วัน</option></select></label></div>
+        <div class="revenue-totals"><div><span>ยอดขายรวม</span><strong id="revenueGross">—</strong></div><div><span>คืนเงิน</span><strong id="revenueRefunds">—</strong></div><div class="net-total"><span>ยอดขายหลังคืนเงิน</span><strong id="revenueNet">—</strong></div><div><span>คำสั่งซื้อ</span><strong id="revenueOrders">—</strong></div></div>
+        <div id="revenueChart" class="revenue-chart" aria-live="polite"></div>
+        <p id="revenueCaption" class="chart-caption"></p>
+        <div class="revenue-actions"><button id="revenueDemo" class="btn ghost small">ลองกราฟข้อมูลสมมติ</button><label class="btn ghost small import-button" for="revenueCsv">↑ นำเข้า CSV</label><input id="revenueCsv" type="file" accept=".csv,text/csv" hidden><button id="revenueTemplate" class="text-action">แม่แบบ CSV ↓</button><button id="revenueClear" class="text-action" hidden>ล้างข้อมูล</button></div>
+        <p id="revenueMessage" class="msg" role="status" aria-live="polite"></p><p class="note revenue-note">CSV ใช้เฉพาะบนเครื่อง ไม่อัปโหลดหรือบันทึกถาวร · ยอดขายหลังคืนเงินยังไม่หักต้นทุนและค่าธรรมเนียม</p>
+        <details class="revenue-table-details"><summary>ดูข้อมูลรายวันและส่งออก</summary><button id="revenueExport" class="btn ghost small" disabled>ส่งออก CSV ↓</button><div id="revenueTable" class="table-scroll"></div></details>
+      </section>
+      <aside class="dashboard-aside"><section class="panel activity-panel"><p class="admin-eyebrow">PLAYER PROGRESS</p><h2>ความเคลื่อนไหวของเซฟ</h2><p class="sub">ข้อมูลที่อัปเดตใน 7 วันล่าสุด</p><div id="activityDonut" class="activity-donut" style="--activity:0%"><div><strong id="activityPercent">—</strong><span>เซฟที่มีการอัปเดต</span></div></div><div class="activity-legend"><p><i></i> อัปเดตใน 7 วัน <b id="activityActive">—</b></p><p><i></i> เซฟอื่น ๆ <b id="activityOther">—</b></p></div><p class="note">วัดจากเวลาอัปเดตเซฟ ไม่ใช่จำนวนผู้เล่นออนไลน์ขณะนี้</p></section><section class="panel quick-panel"><p class="admin-eyebrow">QUICK ACTIONS</p><h2>เริ่มงานได้ทันที</h2><button data-go="news">◈ เขียนประกาศใหม่ <span>↗</span></button><button data-go="mail">✉ ส่งจดหมายถึงผู้เล่น <span>↗</span></button><button data-go="raid">⚔ จัดกิจกรรมบอส <span>↗</span></button></section></aside>
+      </div>
+      <div class="dashboard-lower">
+      <div class="panel recent-panel">
         <h2>ผู้เล่นที่สมัครล่าสุด</h2>
         <p class="sub">10 คนล่าสุด</p>
         <div id="recentPlayers"><div class="empty">กำลังโหลด…</div></div>
       </div>
 
-      <div class="panel" style="margin-top:20px">
+      <div class="panel progress-panel">
         <h2>ผู้เล่นไปถึงด่านไหนกันแล้ว</h2>
         <p class="sub">
-          ตัวเลขที่มีค่าที่สุดสำหรับคนทำเกม — ถ้ามีคนกองอยู่ด่านไหนผิดปกติ แปลว่าด่านนั้นยากเกินไป
-          <br>นับเฉพาะผู้เล่นที่เปิด "เซฟข้ามเครื่อง" ไว้เท่านั้น
+          ใช้สังเกตช่วงที่ผู้เล่นไปต่อได้ยาก<br>นับเฉพาะบัญชีที่มีข้อมูลความคืบหน้าบนเซิร์ฟเวอร์
         </p>
         <div id="funnelList"><div class="empty">กำลังโหลด…</div></div>
       </div>
 
-      <div class="panel">
-        <h2>ข้อมูลที่หน้านี้ยังไม่มี</h2>
-        <p class="sub">อ่านก่อนตัดสินใจว่าจะทำอะไรต่อ</p>
-        <p style="color:var(--ink-soft)">
-          <b>ความคืบหน้าขึ้นมาเฉพาะคนที่เปิด “เซฟข้ามเครื่อง” เอง</b> —
-          ระบบปิดไว้เป็นค่าเริ่มต้นเพราะเป็นข้อมูลส่วนบุคคลตาม PDPA
-          ดังนั้นตัวเลขในหน้านี้จะน้อยกว่าจำนวนผู้เล่นจริงเสมอ
-        </p>
-        <p style="color:var(--ink-soft)">
-          ยังไม่มี: เวลาเข้าเล่นรายวัน · ระยะเวลาที่เล่นต่อครั้ง · จุดที่ผู้เล่นกดออกกลางด่าน ·
-          ระบบแบน · แจกของชดเชยแบบกลุ่ม · ช่องทางให้ผู้ใช้ขอลบบัญชี
-          (<b>ข้อสุดท้าย Google Play บังคับก่อนปล่อยเกม</b>)
-        </p>
-      </div>
+      </div><div class="dashboard-data-note"><span>ⓘ</span><p>ตัวเลขผู้เล่นมาจากข้อมูลบนเซิร์ฟเวอร์ ส่วนรายได้ยังไม่เชื่อมกับระบบร้านค้า โหมดสมมติใช้ดูหน้าตากราฟเท่านั้น เกมยังไม่มีระบบเติมเงินจริง</p></div>
     </section>
 
     <!-- ---------- ประกาศ ---------- -->
@@ -420,6 +424,7 @@
 </div>
 
 <script src="config.js"></script>
+<script src="dashboard.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
