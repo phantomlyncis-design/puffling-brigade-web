@@ -1,0 +1,186 @@
+/* Four places to discover beyond the sanctuary. The ordinary document remains
+   complete when the 3D extension cannot load or JavaScript is unavailable. */
+#courtyard{position:relative;z-index:5;background:var(--paper)}
+.courtyard-station{position:relative;min-height:100svh;display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);align-items:center;gap:7vw;padding:135px var(--side) 110px;scroll-margin-top:0;border-top:1px solid var(--line)}
+.courtyard-panel{position:relative;max-width:520px;z-index:7}
+.courtyard-panel h2{font-weight:400;font-size:clamp(30px,3.05vw,47px);line-height:1.46;letter-spacing:-.025em;margin:18px 0 0}
+.courtyard-panel .courtyard-body{max-width:480px;font-size:clamp(14px,1.12vw,17px);line-height:1.85;color:#675d50;margin-top:21px}
+.courtyard-panel .text-link{margin-top:21px;font-size:13px}
+.courtyard-prologue{margin-bottom:32px;color:#76634b}
+.courtyard-prologue p:first-child{font-family:Georgia,'Times New Roman',serif;font-size:11px;letter-spacing:2.5px}
+.courtyard-prologue p:last-child{font-size:12px;margin-top:8px;color:#837363}
+.courtyard-fallback figcaption{font-size:10px;color:#81715b;line-height:1.7;text-align:center;margin-top:21px}
+.world-fallback img{border-radius:48% 48% 2px 2px;aspect-ratio:1.15;object-fit:cover}
+.brigade-fallback{display:flex;align-items:flex-end;gap:18px}
+.brigade-fallback figure{flex:1;min-width:0;text-align:center}
+.brigade-fallback img{width:100%;height:230px;object-fit:contain;filter:drop-shadow(0 15px 12px #8e6f4120)}
+.brigade-fallback h3{font-size:17px;font-weight:400}
+.brigade-fallback p{font-size:11px;margin-top:8px}
+.creator-fallback{justify-self:center;max-width:340px}
+.creator-fallback img{border-radius:47% 47% 2px 2px;aspect-ratio:.8;object-fit:cover;filter:saturate(.76)}
+.courtyard-panel .creator-name{font:400 clamp(21px,2vw,29px)/1.4 Georgia,'Times New Roman',serif;margin-top:30px;letter-spacing:-.025em}
+.courtyard-social{display:flex;gap:24px;flex-wrap:wrap;margin-top:19px;font-size:12px}
+.courtyard-social a{min-height:44px;display:inline-flex;align-items:center;gap:7px;border-bottom:1px solid transparent}
+.courtyard-social a:hover{color:#8f682f;border-bottom-color:#b59868}
+.creator-signature{font:italic 15px/1.7 Georgia,'Times New Roman',serif;color:#9a805a;margin-top:25px}
+.courtyard-enhanced-only,.courtyard-scene-caption,#courtyard-nav,#courtyard-status{display:none}
+.collection-concept{display:inline-flex;align-items:center;gap:8px;margin-top:20px;color:#7c6645;font-size:10px;line-height:1.7;padding:7px 11px;border:1px solid #a08b623e;background:#fff9ee70}
+.collection-concept::before{content:'';width:4px;height:4px;flex:none;border-radius:50%;background:#ad8b4b}
+.shirt-detail{margin-top:25px}
+.shirt-detail h3{font:400 26px/1.3 Georgia,'Times New Roman',serif;letter-spacing:-.02em}
+.shirt-detail p{font-size:12px;color:#7e6d59;line-height:1.8;margin-top:7px}
+.collection-disclaimer{font-size:11px;line-height:1.95;color:#746856;margin-top:20px}
+.collection-disclaimer>span{color:#8b7b65;font-size:10px}
+.shirt-fallback{justify-self:center;width:min(100%,420px)}
+.shirt-fallback>img{width:100%;height:auto;object-fit:contain}
+
+/* Canvas mode. Anchor positions match the camera's four exhibition stations. */
+html.courtyard-ready{scroll-padding-top:0}
+.courtyard-ready #courtyard{height:520vh;background:none}
+.courtyard-ready .courtyard-station{position:absolute;inset:0 0 auto;display:block;height:100vh;min-height:0;padding:0;border:0;pointer-events:none}
+.courtyard-ready #characters{top:130vh}
+.courtyard-ready #creator{top:260vh}
+.courtyard-ready #collection{top:390vh}
+.courtyard-ready .courtyard-panel{position:fixed;left:var(--side);top:50%;width:36vw;max-width:520px;transform:translateY(calc(-50% + 17px));opacity:0;visibility:hidden;pointer-events:none;transition:opacity .55s ease,transform .65s ease,visibility .55s}
+.courtyard-ready.in-courtyard[data-courtyard="0"] #world .courtyard-panel,
+.courtyard-ready.in-courtyard[data-courtyard="1"] #characters .courtyard-panel,
+.courtyard-ready.in-courtyard[data-courtyard="2"] #creator .courtyard-panel,
+.courtyard-ready.in-courtyard[data-courtyard="3"] #collection .courtyard-panel{opacity:1;visibility:visible;pointer-events:auto;transform:translateY(-50%)}
+.courtyard-ready .courtyard-fallback{display:none}
+.courtyard-ready .courtyard-enhanced-only{display:block}
+.courtyard-ready .courtyard-scene-caption{display:block;position:fixed;bottom:105px;right:var(--side);width:45vw;text-align:center;font-size:10px;letter-spacing:.2px;color:#90794f;opacity:0;visibility:hidden;transition:opacity .5s,visibility .5s}
+.courtyard-ready.in-courtyard[data-courtyard="0"] .courtyard-scene-caption{opacity:1;visibility:visible}
+.in-courtyard .scene-wash,.experience-ready.in-courtyard[data-chapter="4"] .scene-wash{background:linear-gradient(90deg,#faf5e8d6 0%,#faf5e8a3 26%,#faf5e829 47%,transparent 59%),linear-gradient(180deg,#faf5e852 0%,transparent 22%,transparent 70%,#f8f1e3ad 100%);opacity:1}
+.in-courtyard .site-header{background:transparent;border:0;backdrop-filter:none}
+.in-courtyard .scene-frame{opacity:1;visibility:visible}
+.in-courtyard .journey-chrome{opacity:1;visibility:visible;pointer-events:none;justify-content:flex-end}
+.in-courtyard .journey-chrome>:not(#motion-toggle){display:none}
+.in-courtyard #motion-toggle{pointer-events:auto}
+.courtyard-ready #courtyard-nav{position:fixed;z-index:9;bottom:45px;left:var(--side);display:flex;gap:24px;align-items:center;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .4s,visibility .4s}
+.courtyard-ready.in-courtyard #courtyard-nav{opacity:1;visibility:visible;pointer-events:auto}
+#courtyard-nav a{display:inline-flex;align-items:center;gap:7px;min-height:44px;font-size:11px;color:#927f65;white-space:nowrap}
+#courtyard-nav a>span{font:11px Georgia,'Times New Roman',serif;color:#a48c63}
+#courtyard-nav a:hover,#courtyard-nav a[aria-current="step"]{color:#4f4130}
+#courtyard-nav a[aria-current="step"]::before{content:'';display:block;width:5px;height:5px;border-radius:50%;background:#a88a4d}
+.courtyard-ready .brigade-selector{display:flex;flex-wrap:wrap;gap:0 18px;margin-top:23px;padding-bottom:2px;border-bottom:1px solid #a48b6133}
+.brigade-selector button{display:inline-flex;align-items:center;gap:7px;padding:8px 0;min-height:44px;border:0;border-bottom:1px solid transparent;background:none;font-size:12px;color:#8a7a66;transition:color .2s,border-color .2s}
+.brigade-selector button:hover,.brigade-selector button[aria-pressed="true"]{color:#4d3f31;border-bottom-color:#9f7c41}
+.hero-marker{width:6px;height:6px;border-radius:50%;opacity:.65}
+.hero-red{background:#a35648}.hero-green{background:#587f58}.hero-blue{background:#5e839b}
+.brigade-selector button[aria-pressed="true"] .hero-marker{opacity:1;box-shadow:0 0 0 3px #a18a6320}
+.courtyard-ready .hero-detail{display:block;margin-top:24px}
+.detail-kicker{font-size:8px;letter-spacing:2px;color:#99805b}
+.hero-detail h3{font-size:24px;line-height:1.5;font-weight:400;margin-top:8px}
+.hero-detail #hero-role{font-size:12px;color:#8d7555;margin-top:6px}
+.courtyard-ready .shirt-styles{display:flex;gap:15px;flex-wrap:wrap;margin-top:17px}
+.shirt-styles button{display:inline-flex;align-items:center;gap:9px;min-height:44px;padding:5px 0;background:none;border:0;border-bottom:1px solid transparent;color:#8c7b66;font-size:12px}
+.shirt-styles button:hover,.shirt-styles button[aria-pressed="true"]{color:#4d4030;border-bottom-color:#9f7c41}
+.shirt-swatch{display:block;width:18px;height:18px;border-radius:50%;border:1px solid #5e4f322b;box-shadow:inset 0 0 0 3px #ffffff24}
+.swatch-cream{background:#ece1c7}.swatch-forest{background:#405e4c}
+.shirt-styles button[aria-pressed="true"] .shirt-swatch{outline:1px solid #9d7d48;outline-offset:3px}
+.courtyard-ready .shirt-views{display:flex;align-items:center;gap:14px;margin-top:5px}
+.shirt-views button{min-height:44px;padding:0;background:none;border:0;font-size:11px;color:#998974}
+.shirt-views button[aria-pressed="true"]{color:#695031;text-decoration:underline;text-underline-offset:5px}
+.shirt-views>span{font-size:10px;color:#bbab94}
+.courtyard-ready #shirt-interaction{position:fixed;z-index:6;display:block;top:120px;bottom:104px;right:var(--side);width:47vw;opacity:0;visibility:hidden;pointer-events:none;touch-action:pan-y;cursor:grab;transition:opacity .5s,visibility .5s;user-select:none;-webkit-user-select:none}
+.courtyard-ready.in-courtyard[data-courtyard="3"] #shirt-interaction{opacity:1;visibility:visible;pointer-events:auto}
+#shirt-interaction:active{cursor:grabbing}
+#shirt-interaction:focus-visible{outline:1px dashed #96723c88;outline-offset:4px;border-radius:45% 45% 5px 5px}
+.shirt-drag-hint{position:absolute;bottom:0;left:0;right:0;display:flex;justify-content:center;align-items:center;gap:12px;font-size:10px;letter-spacing:.2px;color:#8b7450;pointer-events:none}
+.shirt-drag-hint svg{width:30px;height:16px}
+
+/* The optional gallery has its own fallback; the original sanctuary continues
+   to use its existing canvas and error handling outside this area. */
+.courtyard-loading.in-courtyard #sanctuary-canvas,.courtyard-fallback.in-courtyard #sanctuary-canvas{opacity:0}
+.courtyard-loading.in-courtyard #scene,.courtyard-fallback.in-courtyard #scene{background-image:none;background-color:#efe9db}
+.courtyard-ready.courtyard-loading .courtyard-fallback,.courtyard-ready.courtyard-fallback .courtyard-fallback{display:block;position:fixed;left:53%;top:50%;width:39vw;max-width:570px;transform:translateY(-50%);opacity:0;visibility:hidden;transition:opacity .5s,visibility .5s}
+.courtyard-ready.courtyard-loading .brigade-fallback,.courtyard-ready.courtyard-fallback .brigade-fallback{display:flex}
+.courtyard-ready.courtyard-loading .creator-fallback,.courtyard-ready.courtyard-fallback .creator-fallback{width:27vw;left:59%;max-width:340px}
+.courtyard-ready.courtyard-loading .shirt-fallback,.courtyard-ready.courtyard-fallback .shirt-fallback{width:32vw;left:56%;max-width:420px}
+.courtyard-ready.in-courtyard[data-courtyard="0"] #world .courtyard-fallback,
+.courtyard-ready.in-courtyard[data-courtyard="1"] #characters .courtyard-fallback,
+.courtyard-ready.in-courtyard[data-courtyard="2"] #creator .courtyard-fallback,
+.courtyard-ready.in-courtyard[data-courtyard="3"] #collection .courtyard-fallback{opacity:1;visibility:visible}
+.courtyard-loading .courtyard-enhanced-only,.courtyard-fallback .courtyard-enhanced-only{display:none!important}
+.courtyard-loading .courtyard-scene-caption,.courtyard-fallback .courtyard-scene-caption{display:none}
+.courtyard-loading.in-courtyard #courtyard-status,.courtyard-fallback.in-courtyard #courtyard-status{display:block;position:fixed;z-index:7;right:var(--side);bottom:104px;font-size:10px;line-height:1.6;color:#8d785c;pointer-events:none}
+
+@media(max-width:1100px){
+  .main-nav{gap:21px}.main-nav .courtyard-nav-extra{font-size:12px}
+  .courtyard-ready .courtyard-panel{width:39vw}
+  .courtyard-panel h2{font-size:33px}.courtyard-panel .courtyard-body{font-size:14px}
+  .courtyard-prologue{margin-bottom:24px}
+  .courtyard-ready .brigade-selector{gap:0 12px}.brigade-selector button{font-size:11px}
+  .courtyard-ready #courtyard-nav{gap:18px}
+  .courtyard-panel .creator-name{font-size:23px}
+}
+@media(max-width:850px){.main-nav .courtyard-nav-extra{display:none}}
+@media(max-width:760px){
+  .courtyard-station{grid-template-columns:1fr;gap:30px;padding:112px var(--side) 60px;min-height:100svh}
+  .courtyard-panel{max-width:560px}.courtyard-panel h2{font-size:30px}
+  .courtyard-panel .courtyard-body{font-size:13px;line-height:1.85;margin-top:15px}
+  .courtyard-panel .text-link{font-size:12px;margin-top:14px}
+  .courtyard-prologue{margin-bottom:21px}.courtyard-prologue p:first-child{font-size:9px;letter-spacing:2px}.courtyard-prologue p:last-child{font-size:11px;margin-top:5px}
+  .courtyard-fallback{max-width:550px;width:100%;justify-self:center}
+  .world-fallback img{aspect-ratio:1.5}.creator-fallback{max-width:290px}.creator-fallback img{aspect-ratio:1}
+  .brigade-fallback{gap:10px}.brigade-fallback img{height:175px}.brigade-fallback h3{font-size:14px}.brigade-fallback p{font-size:10px}
+  .shirt-fallback{max-width:320px}.courtyard-fallback figcaption{margin-top:14px}
+  .courtyard-ready .courtyard-panel{top:auto;bottom:86px;left:var(--side);width:86vw;max-width:none;max-height:51svh;overflow-y:auto;overscroll-behavior-y:auto;scrollbar-width:thin;scrollbar-color:#b9a47b44 transparent;padding:3px 1px 5px;transform:translateY(14px)}
+  .courtyard-ready.in-courtyard[data-courtyard="0"] #world .courtyard-panel,
+  .courtyard-ready.in-courtyard[data-courtyard="1"] #characters .courtyard-panel,
+  .courtyard-ready.in-courtyard[data-courtyard="2"] #creator .courtyard-panel,
+  .courtyard-ready.in-courtyard[data-courtyard="3"] #collection .courtyard-panel{transform:translateY(0)}
+  .courtyard-ready .courtyard-panel h2{font-size:29px;line-height:1.4;margin-top:11px}
+  .courtyard-ready .courtyard-world h2{font-size:26px}
+  .courtyard-ready .courtyard-panel .courtyard-body{font-size:12px;line-height:1.75;margin-top:12px}
+  .courtyard-ready .courtyard-prologue{margin-bottom:13px}.courtyard-ready .courtyard-prologue p:first-child{font-size:8px;letter-spacing:1.8px}.courtyard-ready .courtyard-prologue p:last-child{font-size:10px;margin-top:4px}
+  .courtyard-ready .courtyard-panel .eyebrow{font-size:7px;letter-spacing:1.35px;gap:10px}.courtyard-ready .courtyard-panel .small-rule{width:22px}
+  .in-courtyard .scene-wash,.experience-ready.in-courtyard[data-chapter="4"] .scene-wash{background:linear-gradient(180deg,#faf5e833 0%,#faf5e800 22%,#faf5e819 33%,#faf5e8b0 46%,#faf5e8ed 66%,#faf5e8fa 100%)}
+  .courtyard-ready .courtyard-scene-caption{bottom:auto;top:39%;left:var(--side);right:auto;width:86vw;font-size:8px}
+  .courtyard-ready #courtyard-nav{left:var(--side);right:var(--side);bottom:22px;gap:8px;justify-content:space-between;border-top:1px solid #a48b6133;padding-top:5px}
+  #courtyard-nav a{gap:5px;font-size:9px;min-height:44px}#courtyard-nav a>span{font-size:9px}#courtyard-nav a[aria-current="step"]::before{width:3px;height:3px}
+  .in-courtyard #motion-toggle{position:fixed;top:88px;right:var(--side);font-size:8px;min-height:44px;gap:6px}.in-courtyard #motion-toggle svg{width:11px;height:11px}
+  .courtyard-ready .brigade-selector{margin-top:15px;gap:0 17px}.brigade-selector button{font-size:11px;min-height:44px}
+  .courtyard-ready .hero-detail{margin-top:16px}.detail-kicker{font-size:7px;letter-spacing:1.7px}.hero-detail h3{font-size:23px;margin-top:5px}.hero-detail #hero-role{font-size:11px;margin-top:4px}
+  .courtyard-panel .creator-name{font-size:22px;margin-top:21px}.courtyard-social{gap:23px;margin-top:11px;font-size:11px}.creator-signature{font-size:13px;margin-top:14px}
+  .collection-concept{font-size:9px;margin-top:12px;padding:5px 8px}.shirt-detail{margin-top:16px}.shirt-detail h3{font-size:23px}.shirt-detail p{font-size:11px;margin-top:5px}
+  .courtyard-ready .shirt-styles{margin-top:10px;gap:22px}.shirt-styles button{min-height:44px;font-size:11px}.shirt-swatch{width:16px;height:16px}
+  .courtyard-ready .shirt-views{margin-top:0}.shirt-views button{font-size:10px;min-height:44px}
+  .collection-disclaimer{font-size:10px;line-height:1.8;margin-top:10px}.collection-disclaimer>span{font-size:9px}
+  .courtyard-ready #shirt-interaction{top:120px;bottom:auto;left:12%;right:12%;width:auto;height:32svh}.shirt-drag-hint{font-size:8px;gap:9px}.shirt-drag-hint svg{width:26px}
+  .courtyard-ready.courtyard-loading .courtyard-fallback,.courtyard-ready.courtyard-fallback .courtyard-fallback{top:125px;left:21%;width:58%;max-width:none;height:25svh;transform:none}
+  .courtyard-ready.courtyard-loading .courtyard-fallback img,.courtyard-ready.courtyard-fallback .courtyard-fallback img{height:100%;width:100%;object-fit:contain}
+  .courtyard-ready.courtyard-loading .world-fallback img,.courtyard-ready.courtyard-fallback .world-fallback img{object-fit:cover;border-radius:42% 42% 2px 2px}
+  .courtyard-ready.courtyard-loading .brigade-fallback,.courtyard-ready.courtyard-fallback .brigade-fallback{left:12%;width:76%;height:22svh;align-items:stretch}
+  .courtyard-ready.courtyard-loading .brigade-fallback figure,.courtyard-ready.courtyard-fallback .brigade-fallback figure{height:100%}
+  .courtyard-ready.courtyard-loading .creator-fallback,.courtyard-ready.courtyard-fallback .creator-fallback{left:29%;width:42%;height:26svh}
+  .courtyard-ready.courtyard-loading .creator-fallback img,.courtyard-ready.courtyard-fallback .creator-fallback img{object-fit:cover}
+  .courtyard-ready.courtyard-loading .shirt-fallback,.courtyard-ready.courtyard-fallback .shirt-fallback{left:29%;width:42%;height:27svh}
+  .courtyard-ready.courtyard-loading .courtyard-fallback figcaption,.courtyard-ready.courtyard-fallback .courtyard-fallback figcaption{font-size:8px;margin-top:9px}
+  .courtyard-ready.courtyard-loading .brigade-fallback img,.courtyard-ready.courtyard-fallback .brigade-fallback img{height:70%}
+  .courtyard-ready.courtyard-loading .brigade-fallback figcaption,.courtyard-ready.courtyard-fallback .brigade-fallback figcaption{display:block;margin-top:3px}
+  .courtyard-ready .brigade-fallback h3{font-size:11px}.courtyard-ready .brigade-fallback p{font-size:8px;margin-top:3px}
+  .courtyard-loading.in-courtyard #courtyard-status,.courtyard-fallback.in-courtyard #courtyard-status{top:91px;bottom:auto;left:var(--side);right:auto;font-size:8px;max-width:50vw}
+}
+@media(max-width:390px){
+  .courtyard-ready .courtyard-panel{bottom:79px;max-height:53svh}.courtyard-ready .courtyard-panel h2{font-size:27px}.courtyard-ready .courtyard-world h2{font-size:24px}
+  .courtyard-ready .courtyard-panel .eyebrow{font-size:6.7px;letter-spacing:1px}.courtyard-ready .courtyard-panel .courtyard-body{font-size:11.5px}
+  .courtyard-ready #courtyard-nav{bottom:17px}#courtyard-nav a{font-size:8.5px;gap:4px}
+  .courtyard-ready .brigade-selector{gap:0 12px}.brigade-selector button{font-size:10px}
+}
+@media(max-height:700px) and (max-width:760px){
+  .courtyard-ready .courtyard-panel{bottom:73px;max-height:55svh}.courtyard-ready .courtyard-panel h2{font-size:25px;margin-top:8px}.courtyard-ready .courtyard-world h2{font-size:23px}
+  .courtyard-ready .courtyard-panel .courtyard-body{font-size:11px;line-height:1.7;margin-top:9px}.courtyard-ready .courtyard-prologue{margin-bottom:10px}
+  .courtyard-ready .courtyard-panel .text-link{margin-top:9px;min-height:44px}
+  .courtyard-ready #courtyard-nav{bottom:12px}.courtyard-ready #shirt-interaction{top:105px;height:25svh}
+  .courtyard-ready .courtyard-scene-caption{top:31%}.courtyard-ready .collection-concept{margin-top:9px}.courtyard-ready .shirt-detail{margin-top:10px}
+  .courtyard-ready .creator-signature{margin-top:8px}.courtyard-ready .hero-detail{margin-top:10px}
+}
+@media(max-height:720px) and (min-width:761px){
+  .courtyard-ready .courtyard-panel{top:52%;width:39vw;max-height:calc(100vh - 190px);overflow-y:auto;scrollbar-width:thin;scrollbar-color:#b9a47b44 transparent;padding-right:10px}
+  .courtyard-panel h2{font-size:33px;margin-top:12px}.courtyard-panel .courtyard-body{font-size:13px;line-height:1.75;margin-top:14px}
+  .courtyard-prologue{margin-bottom:19px}.courtyard-panel .text-link{margin-top:14px}
+  .courtyard-ready #courtyard-nav{bottom:24px}.courtyard-ready #shirt-interaction{top:95px;bottom:80px}.courtyard-ready .courtyard-scene-caption{bottom:81px}
+  .courtyard-ready .shirt-detail{margin-top:15px}.collection-concept{margin-top:14px}.collection-disclaimer{margin-top:14px}
+}
+@media(prefers-reduced-motion:reduce){.courtyard-panel,#shirt-interaction,#courtyard-nav,.courtyard-scene-caption{transition:none!important}}
