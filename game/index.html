@@ -45,12 +45,12 @@
       .pb-text { color: #FFF6E4;
                  text-shadow: -2px -2px 0 #35304A, 2px -2px 0 #35304A, -2px 2px 0 #35304A, 2px 2px 0 #35304A,
                               0 -2px 0 #35304A, 0 2px 0 #35304A, -2px 0 0 #35304A, 2px 0 0 #35304A, 0 3px 6px rgba(0,0,0,.35); }
-      /* แถบเข้มใต้ข้อความสถานะ (ฉากหลังสว่าง ตัวหนังสือเปล่า ๆ อ่านยาก) — อยู่เหนือหัวราชันที่วิ่งบนหลอด ไม่ทับกัน */
-      #pb-band { position: absolute; left: 420px; width: 1080px; bottom: 318px; height: 50px; box-sizing: border-box;
+      /* แถบเข้มใต้ข้อความสถานะ ชิดเหนือหลอด — ตำแหน่งเดียวกับหน้าโหลดในเกม (BootView: BarY + BarH + 6) เจ้าของ 13 ต.ค. */
+      #pb-band { position: absolute; left: 420px; width: 1080px; bottom: 228px; height: 50px; box-sizing: border-box;
                  border-style: solid; border-width: 25px 35px; border-image: url("TemplateData/tip.png") 44 46 fill / 25px 35px / 0 stretch; opacity: .8; }
-      #pb-status { position: absolute; left: 454px; bottom: 321px; width: 840px; height: 44px; line-height: 44px; font-size: 27px;
+      #pb-status { position: absolute; left: 454px; bottom: 231px; width: 640px; height: 44px; line-height: 44px; font-size: 27px;
                    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-      #pb-percent { position: absolute; right: 454px; bottom: 321px; width: 160px; height: 44px; line-height: 44px; font-size: 27px; text-align: right; }
+      #pb-percent { position: absolute; right: 454px; bottom: 231px; width: 360px; white-space: nowrap; height: 44px; line-height: 44px; font-size: 27px; text-align: right; }
 
       /* หลอด (กรอบ 9 ช่องจากภาพในเกม) */
       #pb-track { position: absolute; left: 420px; bottom: 150px; width: 1080px; height: 72px; }
@@ -61,7 +61,7 @@
       #pb-spark { position: absolute; top: 0; width: 64px; height: 72px; margin-left: -32px; display: none;
                   animation: pb-twinkle 1.1s ease-in-out infinite; }
       @keyframes pb-twinkle { 0%, 100% { transform: scale(.85) rotate(0deg); opacity: .85; } 50% { transform: scale(1.1) rotate(12deg); opacity: 1; } }
-      #pb-runner { position: absolute; bottom: 66px; height: 96px; transform-origin: 62% 100%;
+      #pb-runner { position: absolute; bottom: 66px; height: 112px; transform-origin: 62% 100%;
                    animation: pb-hop .36s ease-in-out infinite alternate; }
       @keyframes pb-hop { from { transform: translateX(-62%) translateY(0) rotate(-4deg) scaleY(.97); }
                           to   { transform: translateX(-62%) translateY(-10px) rotate(-1deg) scaleY(1.02); } }
@@ -84,14 +84,14 @@
       <div id="pb-stage">
         <img id="pb-logo" src="TemplateData/logo.webp" alt="Puffling Brigade">
         <div id="pb-band"></div>
-        <div id="pb-status" class="pb-text">กำลังโหลดเกม…</div>
-        <div id="pb-percent" class="pb-text">0%</div>
         <div id="pb-track">
           <div id="pb-trackbg"></div>
           <div id="pb-fill"></div>
           <img id="pb-spark" src="TemplateData/spark.webp" alt="">
           <img id="pb-runner" src="TemplateData/runner.webp" alt="">
         </div>
+        <div id="pb-status" class="pb-text">กำลังเริ่มดาวน์โหลด…</div>
+        <div id="pb-percent" class="pb-text">0%</div>
         <div id="pb-tip"><div id="pb-tipbg"></div><span class="pb-text"></span></div>
         <button id="pb-retry" type="button">ลองใหม่</button>
       </div>
@@ -112,8 +112,10 @@
 
         // ---------- เวที 1920x1080 ย่อพอดีจอ อยู่กลางเสมอ ----------
         function fit() {
-          // เนื้อหาจริงกว้าง ~1160 (หลอด 1080) — ย่อตามนั้น มือถือแนวตั้งจะได้ไม่เล็กจิ๋ว
-          var k = Math.min(window.innerWidth / 1160, window.innerHeight / 1080);
+          // จอแนวนอน: สูตรเดียวกับในเกม (เวที 1920x1080) — เว็บโหลดเสร็จต่อเข้าหน้าโหลดในเกมได้ตรงตำแหน่ง
+          // จอแนวตั้ง: ย่อตามเนื้อหาจริงกว้าง ~1160 (หลอด 1080) ไม่งั้นเล็กจิ๋ว
+          var w = window.innerWidth, h = window.innerHeight;
+          var k = w >= h ? Math.min(w / 1920, h / 1080) : Math.min(w / 1160, h / 1080);
           stage.style.transform = "scale(" + k + ") translate(-50%, -50%)";
         }
         fit();
@@ -140,14 +142,13 @@
         var target = 0, shown = 0;
         function draw(p) {
           var inner = BAR_W - PAD * 2;
-          var w = Math.max(FH, inner * p);
+          var w = Math.max(FH, inner * p);   // ความยาวหลอด
           fill.style.display = p > 0.001 ? "block" : "none";
           fill.style.width = w + "px";
           var x = PAD + (p > 0.001 ? w : 0);
           spark.style.display = p > 0.001 ? "block" : "none";
           spark.style.left = (x - 6) + "px";
           runner.style.left = Math.max(PAD + 40, x) + "px";
-          percentEl.textContent = Math.floor(p * 100) + "%";
         }
         function tick() {
           shown += (target - shown) * 0.12;
@@ -159,7 +160,102 @@
         draw(0);
         requestAnimationFrame(tick);
 
+        // ---------- ดาวน์โหลดอะไรอยู่ กี่ MB (เจ้าของ 13 ต.ค.) ----------
+        // นับไบต์จริงของไฟล์เกมแต่ละไฟล์: ดัก fetch (ได้ขนาดจาก Content-Length) + ดัก reader.read (ได้ไบต์ที่มาถึง)
+        // ไม่สร้าง Response ใหม่ → ตัวโหลดของเอนจินทำงานเหมือนเดิมทุกอย่าง · โหลดเสร็จคืนของเดิมทันที
+        var FILES = [[/\.data\.unityweb/, "ภาพ เสียง และฉากของเกม"], [/\.wasm/, "โค้ดของเกม"], [/framework/, "ตัวเกม"]];
+        var files = [], phase = "download";
+        var realFetch = window.fetch, RS = window.ReadableStream, RR = window.ReadableStreamDefaultReader;
+        var realGetReader = RS && RS.prototype.getReader, realRead = RR && RR.prototype.read;
+        var RespP = window.Response && Response.prototype, realClone = RespP && RespP.clone;
+        function nameOf(url) {
+          if (!/(^|\/)Build\//.test(url)) return null;
+          for (var i = 0; i < FILES.length; i++) if (FILES[i][0].test(url)) return FILES[i][1];
+          return null;
+        }
+        if (realFetch) window.fetch = function (input) {
+          var url = typeof input === "string" ? input : (input && input.url) || "";
+          var p = realFetch.apply(window, arguments), nm = nameOf(url);
+          if (!nm) return p;
+          var f = { name: nm, loaded: 0, total: 0, done: false, cached: false };
+          files.push(f);
+          return p.then(function (res) {
+            if (res.status === 304) { f.cached = true; f.done = true; return res; }
+            f.total = parseInt(res.headers.get("Content-Length") || "0", 10) || 0;
+            try { if (res.body) res.body.__pb = f; } catch (e) {}
+            return res;
+          }, function (err) { f.done = true; throw err; });
+        };
+        // เอนจินเก็บไฟล์ลงแคชด้วย response.clone() — เบราว์เซอร์เปลี่ยนท่อข้อมูลของตัวเดิมเป็นท่อใหม่ ต้องติดป้ายให้ท่อใหม่ด้วย
+        if (realClone) RespP.clone = function () {
+          var tag = null;
+          try { tag = this.body && this.body.__pb; } catch (e) {}
+          var c = realClone.apply(this, arguments);
+          try { if (tag && this.body) this.body.__pb = tag; } catch (e) {}
+          return c;
+        };
+        if (realGetReader) RS.prototype.getReader = function () {
+          var r = realGetReader.apply(this, arguments);
+          if (this.__pb) r.__pb = this.__pb;
+          return r;
+        };
+        if (realRead) RR.prototype.read = function () {
+          var f = this.__pb, pr = realRead.apply(this, arguments);
+          if (!f) return pr;
+          return pr.then(function (r) {
+            if (r.done) f.done = true;
+            else if (r.value) { f.loaded += r.value.byteLength; if (f.loaded > f.total) f.total = 0; }
+            return r;
+          });
+        };
+        function unhook() {
+          if (realFetch) window.fetch = realFetch;
+          if (realGetReader) RS.prototype.getReader = realGetReader;
+          if (realRead) RR.prototype.read = realRead;
+          if (realClone) RespP.clone = realClone;
+        }
+        function mb(n) { return (n / 1e6).toFixed(1); }
+        var lastStatus = "", lastInfo = "";
+        function info() {
+          if (phase === "error") return;
+          var st, rt;
+          if (phase === "download") {
+            var loaded = 0, total = 0, known = true, busy = null, net = 0;
+            for (var i = 0; i < files.length; i++) {
+              var f = files[i];
+              if (f.cached) continue;
+              net++;
+              loaded += f.loaded;
+              if (f.total > 0) total += f.total; else known = false;
+              if (!f.done && (!busy || f.total > busy.total)) busy = f;
+            }
+            if (net === 0) {
+              st = files.length ? "เปิดข้อมูลเกมที่เคยโหลดไว้ในเครื่อง…" : "กำลังเริ่มดาวน์โหลด…";
+              rt = Math.floor(target * 100) + "%";
+            } else {
+              st = busy ? "กำลังดาวน์โหลด" + busy.name + "…" : "ดาวน์โหลดครบแล้ว";
+              rt = known && total > 0 ? mb(loaded) + " / " + mb(total) + " MB" : mb(loaded) + " MB";
+            }
+          } else if (phase === "prepare") {
+            var fresh = 0;
+            for (var j = 0; j < files.length; j++) if (!files[j].cached) fresh++;
+            st = files.length && !fresh ? "ใช้ไฟล์ที่เคยโหลดไว้ ไม่ต้องดาวน์โหลดใหม่ · กำลังเตรียมเกม…" : "กำลังแตกไฟล์และเตรียมเกม…";
+            rt = Math.floor(target * 100) + "%";
+          } else {
+            st = "พร้อมแล้ว!";
+            rt = "100%";
+          }
+          if (st !== lastStatus) statusEl.textContent = lastStatus = st;
+          if (rt !== lastInfo) percentEl.textContent = lastInfo = rt;
+        }
+
+        // ข้อความอัปเดตตามเวลา (ไม่ผูกกับเฟรม — เฟรมหยุดตอนแท็บซ่อนหรือเครื่องกำลังแตกไฟล์)
+        var infoTimer = setInterval(function () { if (finished) clearInterval(infoTimer); else info(); }, 200);
+
         function showError(msg) {
+          phase = "error";
+          finished = true;
+          unhook();
           clearInterval(tipTimer);
           statusEl.textContent = "โหลดเกมไม่สำเร็จ";
           statusEl.style.color = "#FFD2CC";
@@ -179,6 +275,11 @@
           frameworkUrl: buildUrl + "/WebGL.framework.js.unityweb",
           codeUrl: buildUrl + "/WebGL.wasm.unityweb",
           streamingAssetsUrl: "StreamingAssets",
+          // เก็บไฟล์เกมทั้งสามไว้ในเครื่อง (ค่าเดิมของเอนจินเก็บแค่ไฟล์ข้อมูล โค้ด 11 MB ต้องโหลดใหม่ทุกครั้ง)
+          // must-revalidate = ถามเซิร์ฟเวอร์ก่อนทุกครั้ง ไฟล์บนเว็บเปลี่ยนเมื่อไรก็ได้ของใหม่ ไม่ค้างเวอร์ชันเก่า
+          cacheControl: function (url) {
+            return /\.data\.unityweb|\.wasm|framework\.js/.test(url) ? "must-revalidate" : "no-store";
+          },
           companyName: "DefaultCompany",
           productName: "Cats SSR",
           productVersion: "1.0",
@@ -205,11 +306,14 @@
         script.onload = function () {
           createUnityInstance(canvas, config, function (progress) {
             // ช่วงดาวน์โหลด = 0–95% · ที่เหลือคือเกมกำลังเตรียมตัว
+            // เอนจินรายงาน 0–0.9 ระหว่างดาวน์โหลด (ตามไบต์) แล้ว 0.9–1 ตอนแตกไฟล์/เตรียมเกม
             target = Math.min(0.95, progress * 0.95);
-            if (progress >= 1) statusEl.textContent = "กำลังเตรียมเกม…";
+            if (progress >= 0.9 && phase === "download") phase = "prepare";
           }).then(function () {
+            unhook();
             target = 1;
-            statusEl.textContent = "พร้อมแล้ว!";
+            phase = "ready";
+            info();
             setTimeout(function () {
               finished = true;
               clearInterval(tipTimer);
@@ -218,6 +322,7 @@
               canvas.focus();
             }, 350);
           }).catch(function (message) {
+            unhook();
             if (window.console) console.error(message);
             showError("เบราว์เซอร์นี้เปิดเกมไม่ได้ ลองใช้ Chrome, Edge หรือ Safari รุ่นล่าสุด");
           });
